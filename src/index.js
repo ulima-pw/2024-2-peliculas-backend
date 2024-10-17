@@ -1,5 +1,6 @@
 import express from "express"
 import bodyParser from "body-parser"
+import cors from "cors"
 
 const app = express()
 const port = 3000
@@ -9,6 +10,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended : true
 }))
+
+app.use(cors())
 
 app.use(express.static("assets"))
 
@@ -28,6 +31,8 @@ app.use(express.static("assets"))
  */
 app.post("/login", (req, resp) => {
     const dataInput = req.body
+
+    console.log(dataInput)
 
     const usuario = dataInput.usuario
     const password = dataInput.password
