@@ -66,7 +66,9 @@ app.post("/login", (req, resp) => {
 })
 
 app.get("/peliculas", (req, resp) => {
-    const dataPeliculas = [
+    const categoriaId = req.query.categoria
+
+    let dataPeliculas = [
         {
             "id" : 1,
             "nombre": "Joker 2",
@@ -99,6 +101,13 @@ app.get("/peliculas", (req, resp) => {
         }
     ]
 
+    if (categoriaId !== undefined)
+    {
+        dataPeliculas = dataPeliculas.filter((pelicula) => {
+            return pelicula.categoria === parseInt(categoriaId)
+        })
+    }
+    
     resp.send(dataPeliculas)
 })
 
