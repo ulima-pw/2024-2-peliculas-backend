@@ -15,6 +15,39 @@ app.use(cors())
 
 app.use(express.static("assets"))
 
+const dataPeliculas = [
+    {
+        "id" : 1,
+        "nombre": "Joker 2",
+        "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
+        "categoria" : 1
+    },
+    {
+        "id" : 2,
+        "nombre": "Robot Salvaje",
+        "url" : "https://cdn.apis.cineplanet.com.pe/CDN/media/entity/get/FilmPosterGraphic/HO00002008",
+        "categoria" : 2
+    },
+    {
+        "id" : 3,
+        "nombre": "Alien Romulus",
+        "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
+        "categoria" : 1
+    },
+    {
+        "id" : 4,
+        "nombre": "Beetlejuice 2",
+        "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
+        "categoria" : 2
+    },
+    {
+        "id" : 5,
+        "nombre": "El guardian de la magia",
+        "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
+        "categoria" : 3
+    }
+]
+
 /*
  Endpoint: Login de usuario
  Path: /login
@@ -65,50 +98,39 @@ app.post("/login", (req, resp) => {
     }
 })
 
+/*============================ /peliculas ======================== */
+
 app.get("/peliculas", (req, resp) => {
     const categoriaId = req.query.categoria
 
-    let dataPeliculas = [
-        {
-            "id" : 1,
-            "nombre": "Joker 2",
-            "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
-            "categoria" : 1
-        },
-        {
-            "id" : 2,
-            "nombre": "Robot Salvaje",
-            "url" : "https://cdn.apis.cineplanet.com.pe/CDN/media/entity/get/FilmPosterGraphic/HO00002008",
-            "categoria" : 2
-        },
-        {
-            "id" : 3,
-            "nombre": "Alien Romulus",
-            "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
-            "categoria" : 1
-        },
-        {
-            "id" : 4,
-            "nombre": "Beetlejuice 2",
-            "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
-            "categoria" : 2
-        },
-        {
-            "id" : 5,
-            "nombre": "El guardian de la magia",
-            "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
-            "categoria" : 3
-        }
-    ]
-
     if (categoriaId !== undefined)
     {
-        dataPeliculas = dataPeliculas.filter((pelicula) => {
+        const peliculasFiltradas = dataPeliculas.filter((pelicula) => {
             return pelicula.categoria === parseInt(categoriaId)
         })
+        resp.send(peliculasFiltradas)
+    }else {
+        resp.send(dataPeliculas)
     }
-    
-    resp.send(dataPeliculas)
+})
+
+/*
+ Endpoint: Agregar pelicula
+ Path: /peliculas
+ Method: POST
+ Input:
+ {
+    "nombre" : "Peli1",
+    "url" : "http://...",
+    "categoria" : 2
+ }
+ Output:
+ {
+    "error" : ""
+ }
+ */
+app.post("/peliculas", (req, resp) => {
+
 })
 
 app.listen(port, () => {
