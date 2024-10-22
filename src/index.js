@@ -130,7 +130,26 @@ app.get("/peliculas", (req, resp) => {
  }
  */
 app.post("/peliculas", (req, resp) => {
+    const dataInput = req.body
 
+    if (req.body.nombre === undefined 
+        || req.body.url === undefined 
+        || req.body.categoria === undefined){
+        resp.status(400).send({
+            error : "Input invalido"
+        })
+        return
+    }
+    const nuevoId = dataPeliculas.length + 1
+    const nuevaPelicula = {
+        ...dataInput,
+        id : nuevoId
+    }
+    dataPeliculas.push(nuevaPelicula)
+
+    resp.send({
+        error : ""
+    })
 })
 
 app.listen(port, () => {
