@@ -65,6 +65,43 @@ app.post("/login", (req, resp) => {
     }
 })
 
+app.get("/peliculas", (req, resp) => {
+    const dataPeliculas = [
+        {
+            "id" : 1,
+            "nombre": "Joker 2",
+            "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
+            "categoria" : 1
+        },
+        {
+            "id" : 2,
+            "nombre": "Robot Salvaje",
+            "url" : "https://cdn.apis.cineplanet.com.pe/CDN/media/entity/get/FilmPosterGraphic/HO00002008",
+            "categoria" : 2
+        },
+        {
+            "id" : 3,
+            "nombre": "Alien Romulus",
+            "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
+            "categoria" : 1
+        },
+        {
+            "id" : 4,
+            "nombre": "Beetlejuice 2",
+            "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
+            "categoria" : 2
+        },
+        {
+            "id" : 5,
+            "nombre": "El guardian de la magia",
+            "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
+            "categoria" : 3
+        }
+    ]
+
+    resp.send(dataPeliculas)
+})
+
 app.listen(port, () => {
     console.log("Servidor web iniciado en puerto " + port)
 })
