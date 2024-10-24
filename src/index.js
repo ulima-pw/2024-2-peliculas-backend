@@ -100,6 +100,26 @@ app.post("/login", (req, resp) => {
 
 /*============================ /peliculas ======================== */
 
+// REST (Create, Read, Single Read, Update, Delete)
+
+app.get("/peliculas/:id", (req, resp) => {
+    const idPelicula = parseInt(req.params.id)
+
+    const peliculaADevolver = dataPeliculas.filter((p) => {
+        return p.id === idPelicula
+    })
+
+    if (peliculaADevolver.length === 0) {
+        // Id es incorreto
+        resp.status(400).send({
+            error : "ID de pelicula no existe."
+        })
+        return
+    }
+
+    resp.send(peliculaADevolver[0])
+})
+
 app.get("/peliculas", (req, resp) => {
     const categoriaId = req.query.categoria
 
@@ -151,6 +171,94 @@ app.post("/peliculas", (req, resp) => {
         error : ""
     })
 })
+
+/*
+ Endpoint: Modificar pelicula
+ Path: /peliculas
+ Method: PUT
+ Input:
+ {
+    "id" : 3,
+    "nombre" : "Peli1",
+    "url" : "http://...",
+    "categoria" : 1
+ }
+ Output:
+ {
+    "error" : ""
+ }
+ */
+app.put("/peliculas", (req, resp) => {
+    const dataInput = req.body
+
+    if (req.body.id === undefined){
+        resp.status(400).send({
+            error : "Input invalido"
+        })
+        return
+    }
+
+    // Buscar la pelicula con cierto id
+    for(let p of dataPeliculas){
+        if (p.id === dataInput.id) {
+            // Encontre la pelicula
+            // Modificamos la pelicula encontrada con los datos que hermos recibido
+            // <EXP_BOOLEANA> ? <EXP1> : <EXP2>
+            p.nombre = (dataInput.nombre === undefined ? p.nombre : dataInput.nombre)
+            p.url = (dataInput.url === undefined ? p.url : dataInput.url)
+            p.categoria = (dataInput.categoria === undefined ? p.categoria : dataInput.categoria)
+
+            resp.send({
+                error : ""
+            })
+
+            return;
+        }
+    }
+
+    // Error no encontrar pelicula con id enviado
+    resp.status(400).send({
+        error : "ID de pelicula no existe."
+    })
+    
+})
+
+/*
+ Endpoint: Eliminar pelicula
+ Path: /peliculas/<ID_PELICULA>
+ Method: DELETE
+ Output:
+ {
+    "error" : ""
+ }
+ */
+app.delete("/peliculas/:id", (req, resp) => {
+    const idPelicula = parseInt(req.params.id)
+
+    let posicion = -1
+    for (let i = 0; i < dataPeliculas.length; i++) {
+        const p = dataPeliculas[i]
+        if (p.id === idPelicula) {
+            // Se encontro la pelicula a eliminar
+            posicion = i
+            break
+        }
+    }
+
+    if (posicion === -1) {
+        resp.status(400).send({
+            error : "ID de pelicula no existe."
+        })
+        return
+    }
+
+    dataPeliculas.splice(posicion , 1)
+
+    resp.send({
+        error : ""
+    })
+})
+
 
 app.listen(port, () => {
     console.log("Servidor web iniciado en puerto " + port)
