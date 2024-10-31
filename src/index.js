@@ -1,6 +1,7 @@
 import express from "express"
 import bodyParser from "body-parser"
 import cors from "cors"
+import { Sequelize, DataTypes } from "sequelize"
 
 const app = express()
 const port = 3000
@@ -14,6 +15,58 @@ app.use(bodyParser.urlencoded({
 app.use(cors())
 
 app.use(express.static("assets"))
+
+// Configuracion Sequelize (SQLite)
+const sequelize = new Sequelize({
+    dialect : "sqlite",
+    storage : "data.db"
+})
+
+const Pelicula = sequelize.define(
+    "Pelicula",
+    {
+        id : {
+            type : DataTypes.INTEGER,
+            primaryKey : true,
+            autoIncrement : true
+        },
+        nombre : {
+            type : DataTypes.STRING
+        },
+        url : {
+            type : DataTypes.STRING
+        }
+    },
+    {
+        freezeTableName : true,
+        timestamps : false
+    }
+)
+
+const Usuario = sequelize.define(
+    "Usuario",
+    {
+        id : {
+            type : DataTypes.INTEGER,
+            primaryKey : true,
+            autoIncrement : true
+        },
+        nombre : {
+            type : DataTypes.STRING
+        },
+        usuario : {
+            type : DataTypes.STRING
+        },
+        password : {
+            type : DataTypes.STRING
+        }
+    },
+    {
+        freezeTableName : true,
+        timestamps : false
+    }
+)
+
 
 const dataPeliculas = [
     {
@@ -62,7 +115,7 @@ const dataPeliculas = [
     "error" : ""
  }
  */
-app.post("/login", (req, resp) => {
+app.post("/login", async (req, resp) => {
     const dataInput = req.body
 
     console.log(dataInput)
@@ -80,22 +133,29 @@ app.post("/login", (req, resp) => {
         return
     }
 
-    // Verificar si el usuario y password existen
-    if (usuario === "PW" && password === "123")
-    {
+    const usuarios = await Usuario.findAll({
+        where : {
+            usuario : usuario,
+            password : password
+        }
+    })
+
+    // Verificar si el usuario y password existen en bd
+    if (usuarios.length > 0) {
         // Login exitoso
         const dataOutput = {
             error : ""
         }
         resp.send(dataOutput)
-    }else
-    {
+    }else {
         // Error login
         const dataOutput = {
             error : "Error en el login."
         }
-        resp.send(dataOutput)
+        resp.status(400).send(dataOutput)
     }
+
+    
 })
 
 /*============================ /peliculas ======================== */
