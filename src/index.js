@@ -67,40 +67,6 @@ const Usuario = sequelize.define(
     }
 )
 
-
-const dataPeliculas = [
-    {
-        "id" : 1,
-        "nombre": "Joker 2",
-        "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
-        "categoria" : 1
-    },
-    {
-        "id" : 2,
-        "nombre": "Robot Salvaje",
-        "url" : "https://cdn.apis.cineplanet.com.pe/CDN/media/entity/get/FilmPosterGraphic/HO00002008",
-        "categoria" : 2
-    },
-    {
-        "id" : 3,
-        "nombre": "Alien Romulus",
-        "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
-        "categoria" : 1
-    },
-    {
-        "id" : 4,
-        "nombre": "Beetlejuice 2",
-        "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
-        "categoria" : 2
-    },
-    {
-        "id" : 5,
-        "nombre": "El guardian de la magia",
-        "url" : "https://hips.hearstapps.com/hmg-prod/images/poster-joker-2-folie-a-deux-joaquin-phoenix-lady-gaga-66d8805e725c1.jpg?resize=980:*",
-        "categoria" : 3
-    }
-]
-
 /*
  Endpoint: Login de usuario
  Path: /login
@@ -162,14 +128,12 @@ app.post("/login", async (req, resp) => {
 
 // REST (Create, Read, Single Read, Update, Delete)
 
-app.get("/peliculas/:id", (req, resp) => {
+app.get("/peliculas/:id", async (req, resp) => {
     const idPelicula = parseInt(req.params.id)
 
-    const peliculaADevolver = dataPeliculas.filter((p) => {
-        return p.id === idPelicula
-    })
+    const pelicula = await Pelicula.findByPk(idPelicula)
 
-    if (peliculaADevolver.length === 0) {
+    if (pelicula === null) {
         // Id es incorreto
         resp.status(400).send({
             error : "ID de pelicula no existe."
@@ -177,21 +141,19 @@ app.get("/peliculas/:id", (req, resp) => {
         return
     }
 
-    resp.send(peliculaADevolver[0])
+    resp.send({
+        nombre : pelicula.nombre,
+        url : pelicula.url
+    })
 })
 
-app.get("/peliculas", (req, resp) => {
+app.get("/peliculas", async (req, resp) => {
     const categoriaId = req.query.categoria
 
-    if (categoriaId !== undefined)
-    {
-        const peliculasFiltradas = dataPeliculas.filter((pelicula) => {
-            return pelicula.categoria === parseInt(categoriaId)
-        })
-        resp.send(peliculasFiltradas)
-    }else {
-        resp.send(dataPeliculas)
-    }
+    // TODO: Filtrar por categorias
+    const peliculas = await Pelicula.findAll()
+
+    resp.send(peliculas)
 })
 
 /*
@@ -209,23 +171,21 @@ app.get("/peliculas", (req, resp) => {
     "error" : ""
  }
  */
-app.post("/peliculas", (req, resp) => {
+app.post("/peliculas", async (req, resp) => {
     const dataInput = req.body
 
     if (req.body.nombre === undefined 
-        || req.body.url === undefined 
-        || req.body.categoria === undefined){
+        || req.body.url === undefined){
         resp.status(400).send({
             error : "Input invalido"
         })
         return
     }
-    const nuevoId = dataPeliculas.length + 1
-    const nuevaPelicula = {
-        ...dataInput,
-        id : nuevoId
-    }
-    dataPeliculas.push(nuevaPelicula)
+
+    await Pelicula.create({
+        nombre : req.body.nombre,
+        url : req.body.url
+    })
 
     resp.send({
         error : ""
@@ -248,7 +208,7 @@ app.post("/peliculas", (req, resp) => {
     "error" : ""
  }
  */
-app.put("/peliculas", (req, resp) => {
+app.put("/peliculas", async (req, resp) => {
     const dataInput = req.body
 
     if (req.body.id === undefined){
@@ -259,28 +219,28 @@ app.put("/peliculas", (req, resp) => {
     }
 
     // Buscar la pelicula con cierto id
-    for(let p of dataPeliculas){
-        if (p.id === dataInput.id) {
-            // Encontre la pelicula
-            // Modificamos la pelicula encontrada con los datos que hermos recibido
-            // <EXP_BOOLEANA> ? <EXP1> : <EXP2>
-            p.nombre = (dataInput.nombre === undefined ? p.nombre : dataInput.nombre)
-            p.url = (dataInput.url === undefined ? p.url : dataInput.url)
-            p.categoria = (dataInput.categoria === undefined ? p.categoria : dataInput.categoria)
+    const peliculaAModificar = await Pelicula.findByPk(req.body.id)
 
-            resp.send({
-                error : ""
-            })
-
-            return;
-        }
+    if (peliculaAModificar === null) {
+        // Error no encontrar pelicula con id enviado
+        resp.status(400).send({
+            error : "ID de pelicula no existe."
+        })
+        return
     }
 
-    // Error no encontrar pelicula con id enviado
-    resp.status(400).send({
-        error : "ID de pelicula no existe."
-    })
+    if (req.body.nombre !== undefined) {
+        peliculaAModificar.nombre = req.body.nombre
+    }
+    if (req.body.url !== undefined) {
+        peliculaAModificar.url = req.body.url
+    }
     
+    await peliculaAModificar.save()
+
+    resp.send({
+        error : ""
+    })
 })
 
 /*
@@ -292,27 +252,21 @@ app.put("/peliculas", (req, resp) => {
     "error" : ""
  }
  */
-app.delete("/peliculas/:id", (req, resp) => {
+app.delete("/peliculas/:id", async (req, resp) => {
     const idPelicula = parseInt(req.params.id)
 
-    let posicion = -1
-    for (let i = 0; i < dataPeliculas.length; i++) {
-        const p = dataPeliculas[i]
-        if (p.id === idPelicula) {
-            // Se encontro la pelicula a eliminar
-            posicion = i
-            break
+    const deleteNumber = await Pelicula.destroy({
+        where : {
+            id : idPelicula
         }
-    }
+    })
 
-    if (posicion === -1) {
+    if (deleteNumber === 0) {
         resp.status(400).send({
             error : "ID de pelicula no existe."
         })
         return
     }
-
-    dataPeliculas.splice(posicion , 1)
 
     resp.send({
         error : ""
