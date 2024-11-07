@@ -35,6 +35,9 @@ const Pelicula = sequelize.define(
         },
         url : {
             type : DataTypes.STRING
+        },
+        categoria_id : {
+            type : DataTypes.INTEGER
         }
     },
     {
@@ -66,6 +69,32 @@ const Usuario = sequelize.define(
         timestamps : false
     }
 )
+
+const Categoria = sequelize.define(
+    "Categoria",
+    {
+        id : {
+            type : DataTypes.INTEGER,
+            primaryKey : true,
+            autoIncrement : true
+        },
+        nombre : {
+            type : DataTypes.STRING
+        }
+    },
+    {
+        freezeTableName : true,
+        timestamps : false
+    }
+)
+
+// Pelicula * ----- 1 Categoria
+Pelicula.belongsTo(Categoria, {
+    foreignKey : "categoria_id"
+})
+Categoria.hasMany(Pelicula, {
+    foreignKey : "id"
+})
 
 /*
  Endpoint: Login de usuario
@@ -150,8 +179,17 @@ app.get("/peliculas/:id", async (req, resp) => {
 app.get("/peliculas", async (req, resp) => {
     const categoriaId = req.query.categoria
 
-    // TODO: Filtrar por categorias
-    const peliculas = await Pelicula.findAll()
+    let peliculas;
+    if (categoriaId === undefined)
+    {
+        peliculas = await Pelicula.findAll()
+    }else {
+        peliculas = await Pelicula.findAll({
+            where : {
+                categoria_id : categoriaId
+            }
+        })
+    }
 
     resp.send(peliculas)
 })
@@ -175,17 +213,29 @@ app.post("/peliculas", async (req, resp) => {
     const dataInput = req.body
 
     if (req.body.nombre === undefined 
-        || req.body.url === undefined){
+        || req.body.url === undefined
+        || req.body.categoria_id === undefined){
         resp.status(400).send({
             error : "Input invalido"
         })
         return
     }
 
-    await Pelicula.create({
-        nombre : req.body.nombre,
-        url : req.body.url
-    })
+    try
+    {
+        await Pelicula.create({
+            nombre : req.body.nombre,
+            url : req.body.url,
+            categoria_id : req.body.categoria_id
+        })
+    }catch(error)
+    {
+        console.error(error)
+        resp.status(400).send({
+            error : `Error en cliente: Id de Categoria no existe: ${error.name}`
+        })
+        return
+    }
 
     resp.send({
         error : ""
