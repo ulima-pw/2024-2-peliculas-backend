@@ -1,7 +1,7 @@
 import express from "express"
 import bodyParser from "body-parser"
 import cors from "cors"
-import { Usuario, Pelicula } from "./dao"
+import { Usuario, Pelicula } from "./dao/index.js"
 
 const app = express()
 const port = 3000
