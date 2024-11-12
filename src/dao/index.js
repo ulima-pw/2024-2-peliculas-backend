@@ -48,12 +48,70 @@ const Pelicula = sequelize.define(
     }
 )
 
+const Cine = sequelize.define(
+    "Cine",
+    {
+        id : {
+            type : DataTypes.INTEGER,
+            primaryKey : true,
+            autoIncrement : true
+        },
+        nombre : {
+            type : DataTypes.STRING
+        },
+        direccion : {
+            type : DataTypes.STRING
+        }
+    },
+    {
+        freezeTableName : true,
+        timestamps : false
+    }
+)
+
+const CineXPelicula = sequelize.define(
+    "CineXPelicula",
+    {
+        id : {
+            type : DataTypes.INTEGER,
+            primaryKey : true,
+            autoIncrement : true
+        },
+        cine_id : {
+            type : DataTypes.INTEGER
+        },
+        pelicula_id : {
+            type : DataTypes.INTEGER
+        }
+    },
+    {
+        freezeTableName : true,
+        timestamps : false
+    }
+)
+
 // Pelicula * ----- 1 Categoria
 Pelicula.belongsTo(Categoria, {
     foreignKey : "categoria_id"
 })
 Categoria.hasMany(Pelicula, {
     foreignKey : "id"
+})
+
+// Pelicula 1 ----- * CineXPelicula
+Pelicula.hasMany(CineXPelicula, {
+    foreignKey : "id"
+})
+CineXPelicula.belongsTo(Pelicula, {
+    foreignKey : "pelicula_id"
+})
+
+// Cine 1 ----- * CineXPelicula
+Cine.hasMany(CineXPelicula, {
+    foreignKey : "id"
+})
+CineXPelicula.belongsTo(Cine, {
+    foreignKey : "cine_id"
 })
 
 const Usuario = sequelize.define(
@@ -83,7 +141,9 @@ const Usuario = sequelize.define(
 export {
     Pelicula,
     Usuario,
-    Categoria
+    Categoria,
+    Cine,
+    CineXPelicula
 }
 
 export default sequelize
