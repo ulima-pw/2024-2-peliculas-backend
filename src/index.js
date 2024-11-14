@@ -1,7 +1,7 @@
 import express from "express"
 import bodyParser from "body-parser"
 import cors from "cors"
-import { Usuario, Pelicula } from "./dao/index.js"
+import { Usuario, Pelicula, Categoria, Cine } from "./dao/index.js"
 
 const app = express()
 const port = 3000
@@ -72,6 +72,18 @@ app.post("/login", async (req, resp) => {
     }
 
     
+})
+
+/*============================ /categorias ======================== */
+app.get("/categorias", async (req, resp) => {
+    const categorias = await Categoria.findAll()
+    resp.send(categorias)
+})
+
+/*============================ /cines ======================== */
+app.get("/cines", async (req, resp) => {
+    const cines = await Cine.findAll()
+    resp.send(cines)
 })
 
 /*============================ /peliculas ======================== */

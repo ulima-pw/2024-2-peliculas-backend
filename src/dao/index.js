@@ -1,10 +1,19 @@
 import { Sequelize, DataTypes } from "sequelize"
 
 // Configuracion Sequelize (SQLite)
-const sequelize = new Sequelize({
+/*const sequelize = new Sequelize({
     dialect : "sqlite",
     storage : "data.db"
-})
+})*/
+
+const sequelize = new Sequelize(
+    'peliculas_db', 
+    'peliculas', 
+    'peliculas', {
+    host: 'localhost',
+    port: 5432,
+    dialect: 'postgres'
+});
 
 const Categoria = sequelize.define(
     "Categoria",
@@ -57,10 +66,10 @@ const Cine = sequelize.define(
             autoIncrement : true
         },
         nombre : {
-            type : DataTypes.STRING
+            type : DataTypes.STRING(50)
         },
         direccion : {
-            type : DataTypes.STRING
+            type : DataTypes.STRING(150)
         }
     },
     {
@@ -123,13 +132,13 @@ const Usuario = sequelize.define(
             autoIncrement : true
         },
         nombre : {
-            type : DataTypes.STRING
+            type : DataTypes.STRING(100)
         },
         usuario : {
-            type : DataTypes.STRING
+            type : DataTypes.STRING(20)
         },
         password : {
-            type : DataTypes.STRING
+            type : DataTypes.STRING(20)
         }
     },
     {
