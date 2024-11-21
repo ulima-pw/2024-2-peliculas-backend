@@ -6,14 +6,26 @@ import { Sequelize, DataTypes } from "sequelize"
     storage : "data.db"
 })*/
 
-const sequelize = new Sequelize(
-    'peliculas_db', 
+/* const sequelize = new Sequelize(
+    'postgres', 
     'peliculas', 
     'peliculas', {
     host: 'localhost',
     port: 5432,
     dialect: 'postgres'
-});
+}); */
+
+const sequelize = new Sequelize(
+    process.env.DATABASE_URL,
+    {
+        dialectOptions : {
+            ssl : {
+                require : true,
+                rejectUnauthorized : false
+            }
+        }
+    }
+)
 
 const Categoria = sequelize.define(
     "Categoria",

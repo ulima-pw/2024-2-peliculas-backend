@@ -4,7 +4,7 @@ import cors from "cors"
 import { Usuario, Pelicula, Categoria, Cine } from "./dao/index.js"
 
 const app = express()
-const port = 3000
+const port = process.env.PORT
 
 // Configuracion para trabajar con formularios POST
 app.use(bodyParser.json())
