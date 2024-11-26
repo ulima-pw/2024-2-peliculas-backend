@@ -16,6 +16,9 @@ app.use(cors())
 
 app.use(express.static("assets"))
 
+app.get("/", (req, resp) => {
+    resp.send("Bienvenido a la API de Peliculas")
+});
 
 /*
  Endpoint: Login de usuario
